@@ -15,17 +15,26 @@ galleryEls.insertAdjacentHTML(`beforeend`, galleryItems.map(({ preview, original
     .join(''));
 
 galleryEls.addEventListener('click', getUrlBigPicture);
+
 function getUrlBigPicture(event) {
+    event.preventDefault()
     if (event.target.nodeName !== 'IMG') {
         return
     };
-    const instance = basicLightbox.create(`<img src="${event.target.dataset.source}">`, {onShow: (instance) => {
-        document.onkeydown = function (e)  {
-            e.preventDefault();
-            if (e.code == 'Escape') {
-                instance.close();
-            }
-        }
-    } })
+
+    function checkEscape(event) {
+    if (event.code == 'Escape') {
+    instance.close();
+    }
+    }
+    
+    const instance = basicLightbox.create(`<img src="${event.target.dataset.source}">`, {
+        onShow: (instance) => {
+            window.addEventListener('keydown', checkEscape);
+        },
+        onClose: (instance) => { window.removeEventListener('keydown', checkEscape) }
+    });
     instance.show();
 }
+
+   
